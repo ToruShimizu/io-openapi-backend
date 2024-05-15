@@ -57,9 +57,13 @@ jobs:
               generator-tag: latest
               command-args: |
                 -i=openapi.yaml \
-                -o=client \
+                -o=client/packages/typescript-fetch \
                 --generate-alias-as-model \
                 --enable-post-process-file
+
+          - name: Publish npm package for DEV
+            RUN: |
+              ls -la client
 
           - name: Publish npm package for DEV
             # パッケージの公開時に "dev" タグを付ける
