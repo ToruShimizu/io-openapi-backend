@@ -61,9 +61,10 @@ jobs:
                 --generate-alias-as-model \
                 --enable-post-process-file
 
-          - name: Publish npm package for DEV
-            RUN: |
-              ls -la client
+          - name: install node_modules & build
+            run: |
+              cd client
+              npm ci
 
           - name: Publish npm package for DEV
             # パッケージの公開時に "dev" タグを付ける
