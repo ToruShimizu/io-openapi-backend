@@ -46,3 +46,15 @@ jobs:
               echo "::set-output name=api_version::`yq r './openapi.yaml' 'info.version'`"
               echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
               echo "::set-output name=dev_version::`date +"%Y%m%d%I%M"`"
+
+          # https://openapi-generator.tech/docs/usage/#generate
+          - name: Generate OpenAPI Client for typescript-fetch
+            uses: openapi-generators/openapitools-generator-action@v1
+            with:
+              generator: typescript-fetch
+              generator-tag: latest
+              command-args: |
+                -i=openapi.yaml \
+                -o=client/packages/io-openapi-client/ \
+                --generate-alias-as-model \
+                --enable-post-process-file
