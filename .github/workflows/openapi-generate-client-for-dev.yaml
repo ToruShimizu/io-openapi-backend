@@ -28,7 +28,6 @@ jobs:
             with:
               repository: ToruShimizu/io-openapi-client
               token: ${{ steps.generate-apps-token.outputs.token }}
-              path: client
 
           # nodeのセットアップ
           - name: Setup node
