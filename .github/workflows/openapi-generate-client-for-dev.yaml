@@ -34,3 +34,15 @@ jobs:
             with:
               node-version: 20.x
               registry-url: https://npm.pkg.github.com
+
+          # yqセットアップ (openapi.yamlの分析に利用)
+          - name: Setup yq
+            uses: chrisdickinson/setup-yq@latest
+
+          # 開発用パッケージバージョン作成のための情報を取得
+          - name: Get vars
+            id: vars
+            run: |
+              echo "::set-output name=api_version::`yq r './openapi.yaml' 'info.version'`"
+              echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+              echo "::set-output name=dev_version::`date +"%Y%m%d%I%M"`"
