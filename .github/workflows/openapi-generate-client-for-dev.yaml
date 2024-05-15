@@ -1,8 +1,10 @@
 name: "OpenAPI: Generate Client For Dev"
 on:
   push:
-    paths:
-      - 'openapi.yaml'
+    branches:
+      - main
+    # paths:
+    #   - 'openapi.yaml'
 
 jobs:
     generate-openapi-client:
