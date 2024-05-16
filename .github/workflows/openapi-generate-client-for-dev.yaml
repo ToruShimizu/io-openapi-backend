@@ -60,13 +60,6 @@ jobs:
                 -o=client/typescript-fetch-client \
                 --generate-alias-as-model \
                 --enable-post-process-file
-          - name: check dir
-            run: |
-              ls -la
-              cd client
-              ls -la
-              cd typescript-fetch-client
-              ls -la
 
           - name: install node_modules & build
             run: |
