@@ -60,7 +60,9 @@ jobs:
                 -o=client/packages/typescript-fetch \
                 --generate-alias-as-model \
                 --enable-post-process-file
-
+          - name: Copy generated client to source directory
+            run: |
+              cp -r client/packages/typescript-fetch/* client/src/
           - name: install node_modules & build
             run: |
               cd client
