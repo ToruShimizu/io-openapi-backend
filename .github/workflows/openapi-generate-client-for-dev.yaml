@@ -28,6 +28,7 @@ jobs:
             with:
               repository: ToruShimizu/io-openapi-client
               token: ${{ steps.generate-apps-token.outputs.token }}
+              path: client
 
           # nodeのセットアップ
           - name: Setup node
@@ -48,6 +49,8 @@ jobs:
               echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
               echo "::set-output name=dev_version::`date +"%Y%m%d%I%M"`"
               ls -la
+              cd client
+              ls -la
 
           # https://openapi-generator.tech/docs/usage/#generate
           - name: Generate OpenAPI Client for typescript-fetch
@@ -61,6 +64,8 @@ jobs:
                 --enable-post-process-file
           - name: check dir
             run: |
+              ls -la
+              cd client
               ls -la
 
           - name: install node_modules & build
