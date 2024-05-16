@@ -65,7 +65,7 @@ jobs:
           - name: check dir
             run: |
               ls -la
-              cd client
+              cd typescript-fetch-client
               ls -la
 
           - name: install node_modules & build
