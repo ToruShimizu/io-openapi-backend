@@ -65,6 +65,7 @@ jobs:
             run: |
               cd client
               npm ci
+              npm run build
 
           - name: Set up Git user
             run: |
