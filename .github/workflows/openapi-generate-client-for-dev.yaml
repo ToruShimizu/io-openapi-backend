@@ -83,6 +83,7 @@ jobs:
             # パッケージの公開時に "dev" タグを付ける
             run: |
               VERSION=${{ steps.vars.outputs.api_version }}
+              cd client
               npm version ${VERSION}-${{ steps.vars.outputs.sha_short }}.${{ steps.vars.outputs.dev_version }}
               npm publish --tag dev
             env:
