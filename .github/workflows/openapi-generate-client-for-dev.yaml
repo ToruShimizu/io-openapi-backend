@@ -28,7 +28,6 @@ jobs:
             with:
               repository: ToruShimizu/io-openapi-client
               token: ${{ steps.generate-apps-token.outputs.token }}
-              path: client
 
           # nodeのセットアップ
           - name: Setup node
@@ -57,12 +56,9 @@ jobs:
               generator-tag: latest
               command-args: |
                 -i=openapi.yaml \
-                -o=client/packages/typescript-fetch \
                 --generate-alias-as-model \
                 --enable-post-process-file
-          - name: Copy generated client to source directory
-            run: |
-              cp -r client/packages/typescript-fetch/* client/src/
+
           - name: install node_modules & build
             run: |
               cd client
@@ -78,7 +74,6 @@ jobs:
             # パッケージの公開時に "dev" タグを付ける
             run: |
               VERSION=${{ steps.vars.outputs.api_version }}
-              cd client
               npm version ${VERSION}-${{ steps.vars.outputs.sha_short }}.${{ steps.vars.outputs.dev_version }}
               npm publish --tag dev
             env:
