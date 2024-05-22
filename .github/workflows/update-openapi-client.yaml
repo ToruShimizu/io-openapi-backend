@@ -77,7 +77,7 @@ jobs:
       # openapi.yaml のバージョンを上書きする
       - name: OpenAPI Versioning
         run: |
-        sed -i -e "s/version: ${{ steps.vars.outputs.current_version }}/version: ${{ env.new_version }}/" openapi.yaml
+          sed -i -e "s/version: ${{ steps.vars.outputs.current_version }}/version: ${{ env.new_version }}/" openapi.yaml
 
       # GitHub Apps は branch protection を bypass する設定することで、commit を master に直pushすることができる
       # まずは GitHub Apps のtoken を取得
