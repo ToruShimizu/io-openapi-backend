@@ -1,6 +1,7 @@
 name: "OpenAPI: Update Version"
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
