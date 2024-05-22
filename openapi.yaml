@@ -7,7 +7,7 @@ servers:
   - url: http://localhost:3000
     description: Optional server description, e.g. Main (production) server
 paths:
-  /users:
+  /api/users:
     get:
       summary: Returns a list of users.
       description: Optional extended description in CommonMark or HTML.
