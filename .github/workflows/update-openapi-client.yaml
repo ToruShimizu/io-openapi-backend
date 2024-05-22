@@ -73,3 +73,24 @@ jobs:
           VERSION=${{ steps.vars.outputs.current_version }} &&
           a=( ${VERSION//./ } ) && a[0]=$((a[0] + 1))
           echo "new_version=${a[0]}.0.0" >> $GITHUB_ENV
+
+      # openapi.yaml のバージョンを上書きする
+      - name: OpenAPI Versioning
+        run: |
+        sed -i -e "s/version: ${{ steps.vars.outputs.current_version }}/version: ${{ env.new_version }}/" openapi.yaml
+
+      # GitHub Apps は branch protection を bypass する設定することで、commit を master に直pushすることができる
+      # まずは GitHub Apps のtoken を取得
+      - name: Generate apps token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.OPENAPI_CLIENT_GENERATED_APP_ID }}
+          private_key: ${{ secrets.OPENAPI_CLIENT_GENERATED_PRIVATE_KEY }}
+
+      # 次に backendリポジトリ(selfリポジトリ) へ commit
+      - name: Commit New Version to baseinc/backend repo
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore(release): openapi.yaml update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
+          github-token: ${{ steps.generate_token.outputs.token }}
