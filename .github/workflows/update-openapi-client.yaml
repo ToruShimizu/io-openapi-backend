@@ -93,4 +93,3 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore(release): openapi.yaml update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
-          github-token: ${{ steps.generate_token.outputs.token }}
