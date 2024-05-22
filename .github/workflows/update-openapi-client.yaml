@@ -12,7 +12,7 @@ on:
 concurrency: ${{ github.workflow }}
 
 jobs:
-  update-openapi-version-cart:
+  update-openapi-version:
     runs-on: ubuntu-latest
     # selfリポジトリ に対してコミットを追加するため、対象のコミットコメントの場合、workflowは無視する
     if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
