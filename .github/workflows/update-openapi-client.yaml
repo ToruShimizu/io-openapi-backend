@@ -5,8 +5,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "openapi.yaml"
+    # paths:
+    #   - "openapi.yaml"
 
 # 複数回連続実行された場合、直列に実行されて、最後のワークフローが有効になるようにconcurrencyを設定
 concurrency: ${{ github.workflow }}
