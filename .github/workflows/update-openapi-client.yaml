@@ -1,0 +1,74 @@
+name: "OpenAPI: Update Version"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "openapi.yaml"
+
+# 複数回連続実行された場合、直列に実行されて、最後のワークフローが有効になるようにconcurrencyを設定
+concurrency: ${{ github.workflow }}
+
+jobs:
+  update-openapi-version-cart:
+    runs-on: ubuntu-latest
+    # selfリポジトリ に対してコミットを追加するため、対象のコミットコメントの場合、workflowは無視する
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
+    steps:
+      - name: Checkout Current Repogitory
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.x
+          registry-url: https://npm.pkg.github.com
+
+      # openapi.yamlの分析に利用
+      - name: Setup yq
+        uses: chrisdickinson/setup-yq@latest
+
+      # 現在のバージョン番号を取得（例. current_version = 1.2.3）
+      - name: Get vars
+        id: vars
+        run: |
+          echo "::set-output name=current_version::`yq r openapi.yaml 'info.version'`"
+
+      # 基本はpatchバージョンが更新される
+      # commit comment を遡り、prefix に特定の文字列があれば minor や major バージョンを更新
+      - name: Get version type
+        uses: actions/github-script@v6
+        id: version-type
+        with:
+          script: |
+            const commits = ${{ toJSON(github.event.commits) }}
+            for (const commit of commits.reverse()) {
+              if (commit.message.startsWith('[openapi/major]')) return 'major'
+              if (commit.message.startsWith('[openapi/minor]')) return 'minor'
+              if (commit.message.startsWith('[openapi/patch]')) return 'patch'
+            }
+            return 'patch'
+          result-encoding: string
+
+      # patchバージョンを更新（例. 1.2.3 → 1.2.4）
+      - name: Version Up (patch)
+        if: steps.version-type.outputs.result == 'patch'
+        run: |
+          VERSION=${{ steps.vars.outputs.current_version }} &&
+          a=( ${VERSION//./ } ) && a[2]=$((a[2] + 1))
+          echo "new_version=${a[0]}.${a[1]}.${a[2]}" >> $GITHUB_ENV
+      # minorバージョンを更新（例. 1.2.3 → 1.3.0）
+      - name: Version Up (minor)
+        if: steps.version-type.outputs.result == 'minor'
+        run: |
+          VERSION=${{ steps.vars.outputs.current_version }} &&
+          a=( ${VERSION//./ } ) && a[1]=$((a[1] + 1))
+          echo "new_version=${a[0]}.${a[1]}.0" >> $GITHUB_ENV
+      # majorバージョンを更新（例. 1.2.3 → 2.0.0）
+      - name: Version Up (major)
+        if: steps.version-type.outputs.result == 'major'
+        run: |
+          VERSION=${{ steps.vars.outputs.current_version }} &&
+          a=( ${VERSION//./ } ) && a[0]=$((a[0] + 1))
+          echo "new_version=${a[0]}.0.0" >> $GITHUB_ENV
