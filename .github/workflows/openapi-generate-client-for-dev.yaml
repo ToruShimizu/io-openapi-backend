@@ -63,7 +63,7 @@ jobs:
           - name: install node_modules & build
             run: |
               cd client
-              npm ci
+              npm install
               npx tsc
 
           - name: Set up GitHub Actions bot as Git user
