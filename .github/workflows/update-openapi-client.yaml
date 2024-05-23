@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout Current Repogitory
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -100,6 +102,7 @@ jobs:
           token: ${{ steps.generate_token.outputs.token }}
           repository: ToruShimizu/io-openapi-client
           path: client
+          fetch-depth: 0
 
       # https://openapi-generator.tech/docs/usage/#generate
       - name: OpenAPI Generate typescript-fetch
