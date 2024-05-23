@@ -32,6 +32,12 @@ paths:
     get:
       summary: Returns a list of users.
       description: Optional extended description in CommonMark or HTML.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
       tags:
         - appsFoo
       operationId: getUser
