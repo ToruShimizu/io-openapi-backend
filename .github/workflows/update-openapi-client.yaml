@@ -88,8 +88,49 @@ jobs:
           app_id: ${{ secrets.OPENAPI_CLIENT_GENERATED_APP_ID }}
           private_key: ${{ secrets.OPENAPI_CLIENT_GENERATED_PRIVATE_KEY }}
 
-      # 次に backendリポジトリ(selfリポジトリ) へ commit
-      - name: Commit New Version to baseinc/backend repo
+      # 次に backendリポジトリ へ commit
+      - name: Commit New Version to ToruShimizu/io-openapi-backend repo
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore(release): openapi.yaml update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
+
+      # PR生成のために、io-openapi-client をチェックアウト
+      - name: Checkout Client Repogitory
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          repository: ToruShimizu/io-openapi-client
+          path: client
+
+      # https://openapi-generator.tech/docs/usage/#generate
+      - name: OpenAPI Generate typescript-fetch
+        uses: openapi-generators/openapitools-generator-action@v1
+        with:
+          generator: typescript-fetch
+          generator-tag: latest
+          command-args: |
+            -i=openapi.yaml \
+            -o=client/typescript-fetch-client \
+            --generate-alias-as-model \
+            --enable-post-process-file
+
+      # openapi.yaml で更新したバージョン番号と同じものを、package.json に対して適用する
+      - name: Update release version
+        run: |
+          cd client/typescript-fetch-client
+          npm version ${{ env.new_version }}
+
+      # PR作成
+      # [automerge] というprefixをcommit commentにつけることで、次のstepで自動マージが発火する
+      - name: Create pull request to ToruShimizu/io-openapi-client repo
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          path: client
+          delete-branch: true
+          commit-message: "chore(release): npm package update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
+          title: "[automerge] chore(release): npm package update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
+          body: |
+            io-openapi-typescript-fetch: ${{ env.new_version }}
+          branch: chore/io-openapi-client
+          branch-suffix: short-commit-hash # 同じプルリクは作らない
