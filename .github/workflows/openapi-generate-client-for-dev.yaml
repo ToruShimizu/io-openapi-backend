@@ -73,8 +73,10 @@ jobs:
             run: |
               VERSION=${{ steps.vars.outputs.api_version }}
               cd client
+              git stash
               npm version ${VERSION}-${{ steps.vars.outputs.sha_short }}.${{ steps.vars.outputs.dev_version }}
               npm publish --tag dev
+              git stash pop
             env:
               # NODE_AUTH_TOKEN には backend リポジトリの GITHUB_TOKEN を使用する
               NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
