@@ -125,7 +125,7 @@ jobs:
       - name: Update release version
         run: |
           cd client/typescript-fetch-client
-          npm version ${{ env.new_version }}
+          npm  --no-git-tag-version version ${{ env.new_version }}
 
       # PR作成
       # [automerge] というprefixをcommit commentにつけることで、次のstepで自動マージが発火する
