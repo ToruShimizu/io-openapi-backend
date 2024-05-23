@@ -1,10 +1,6 @@
 name: "OpenAPI: Generate Client For Dev"
 on:
-  push:
-    branches:
-      - main
-    # paths:
-    #   - 'openapi.yaml'
+  workflow_dispatch:
 
 jobs:
     generate-openapi-client:
