@@ -10,7 +10,7 @@ paths:
   /api/users:
     get:
       summary: Returns a list of users.
-      description: Optional extended description in CommonMark or HTML.
+      description: ユーザー一覧取得
       tags:
         - appsFoo
       operationId: getUsers
@@ -37,7 +37,7 @@ paths:
   /api/users/{id}:
     get:
       summary: Returns a list of users.
-      description: Optional extended description in CommonMark or HTML.
+      description: 任意のユーザーを1件取得
       parameters:
         - in: path
           name: id
