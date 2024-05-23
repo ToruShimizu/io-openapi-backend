@@ -114,6 +114,11 @@ jobs:
             --generate-alias-as-model \
             --enable-post-process-file
 
+      - name: Set up GitHub Actions bot as Git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
       # openapi.yaml で更新したバージョン番号と同じものを、package.json に対して適用する
       - name: Update release version
         run: |
