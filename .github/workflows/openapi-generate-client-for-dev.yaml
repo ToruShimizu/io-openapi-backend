@@ -73,6 +73,7 @@ jobs:
             run: |
               VERSION=${{ steps.vars.outputs.api_version }}
               cd client
+              git status
               npm version ${VERSION}-${{ steps.vars.outputs.sha_short }}.${{ steps.vars.outputs.dev_version }}
               npm publish --tag dev
             env:
