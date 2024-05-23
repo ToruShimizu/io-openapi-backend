@@ -17,6 +17,8 @@ jobs:
           # backendリポジトリのチェックアウト（openapi.ymlがあるリポジトリ）
           - name: Checkout Current Repository
             uses: actions/checkout@v4
+            with:
+              fetch-depth: 0
 
           # Api Clientリポジトリのチェックアウト（パッケージをpublishするリポジトリ）
           - name: Checkout API Client Repository
@@ -25,6 +27,7 @@ jobs:
               repository: ToruShimizu/io-openapi-client
               token: ${{ steps.generate-apps-token.outputs.token }}
               path: client
+              fetch-depth: 0
 
           # nodeのセットアップ
           - name: Setup node
