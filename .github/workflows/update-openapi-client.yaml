@@ -1,3 +1,4 @@
+# APIクライアントのバージョンを更新する
 name: "OpenAPI: Update Version"
 
 on:
@@ -18,13 +19,11 @@ jobs:
     steps:
       - name: Checkout Current Repogitory
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 20.x
           registry-url: https://npm.pkg.github.com
 
       # openapi.yamlの分析に利用
@@ -38,7 +37,7 @@ jobs:
           echo "::set-output name=current_version::`yq r openapi.yaml 'info.version'`"
 
       # 基本はpatchバージョンが更新される
-      # commit comment を遡り、prefix に特定の文字列があれば minor や major バージョンを更新
+      # commitメッセージのprefix に特定の文字列があれば minor や major バージョンを更新
       - name: Get version type
         uses: actions/github-script@v6
         id: version-type
@@ -80,7 +79,7 @@ jobs:
         run: |
           sed -i -e "s/version: ${{ steps.vars.outputs.current_version }}/version: ${{ env.new_version }}/" openapi.yaml
 
-      # GitHub Apps は branch protection を bypass する設定することで、commit を master に直pushすることができる
+      # GitHub Apps は branch protection を bypass する設定をすることで、commit を master に直pushすることができる
       # まずは GitHub Apps のtoken を取得
       - name: Generate apps token
         id: generate_token
@@ -95,14 +94,13 @@ jobs:
         with:
           commit_message: "chore(release): openapi.yaml update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
 
-      # PR生成のために、io-openapi-client をチェックアウト
+      # io-openapi-clientリポジトリにPRを生成するために、io-openapi-clientリポジトリをチェックアウト
       - name: Checkout Client Repogitory
         uses: actions/checkout@v4
         with:
           token: ${{ steps.generate_token.outputs.token }}
           repository: ToruShimizu/io-openapi-client
           path: client
-          fetch-depth: 0
 
       # https://openapi-generator.tech/docs/usage/#generate
       - name: OpenAPI Generate typescript-fetch
@@ -128,7 +126,6 @@ jobs:
           npm  --no-git-tag-version version ${{ env.new_version }}
 
       # PR作成
-      # [automerge] というprefixをcommit commentにつけることで、次のstepで自動マージが発火する
       - name: Create pull request to ToruShimizu/io-openapi-client repo
         uses: peter-evans/create-pull-request@v4
         with:
@@ -136,8 +133,10 @@ jobs:
           path: client
           delete-branch: true
           commit-message: "chore(release): npm package update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
+          # [automerge] というprefixをcommitメッセージに付与することで、次のio-openapi-clientリポジトリのworkflowでで自動マージが発火するようにしている
           title: "[automerge] chore(release): npm package update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
           body: |
             io-openapi-typescript-fetch: ${{ env.new_version }}
           branch: chore/io-openapi-client
-          branch-suffix: short-commit-hash # 同じプルリクは作らない
+          # hashをbranch名に含めることで、同じPRが作られないようにする
+          branch-suffix: short-commit-hash

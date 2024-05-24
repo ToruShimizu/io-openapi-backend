@@ -1,3 +1,4 @@
+# 開発用のクライアントを生成し、npmパッケージとして公開する
 name: "OpenAPI: Generate Client For Dev"
 on:
   workflow_dispatch:
@@ -18,7 +19,7 @@ jobs:
           - name: Checkout Current Repository
             uses: actions/checkout@v4
 
-          # Api Clientリポジトリのチェックアウト（パッケージをpublishするリポジトリ）
+          # io-openapi-clientリポジトリのチェックアウト（パッケージをpublishするリポジトリ）
           - name: Checkout API Client Repository
             uses: actions/checkout@v4
             with:
