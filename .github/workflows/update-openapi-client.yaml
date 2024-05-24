@@ -34,7 +34,7 @@ jobs:
       - name: Get vars
         id: vars
         run: |
-          echo "::set-output name=current_version::`yq r openapi.yaml 'info.version'`"
+          echo "api_version=$(yq r openapi.yaml 'info.version')" >> $GITHUB_OUTPUT
 
       # 基本はpatchバージョンが更新される
       # commitメッセージのprefix に特定の文字列があれば minor や major バージョンを更新

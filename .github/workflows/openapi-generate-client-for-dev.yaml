@@ -42,9 +42,9 @@ jobs:
           - name: Get vars
             id: vars
             run: |
-              echo "::set-output name=api_version::`yq r './openapi.yaml' 'info.version'`"
-              echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-              echo "::set-output name=dev_version::`date +"%Y%m%d%I%M"`"
+              echo "api_version=$(yq r './openapi.yaml' 'info.version')" >> $GITHUB_OUTPUT
+              echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+              echo "dev_version=$(date +"%Y%m%d%I%M")" >> $GITHUB_OUTPUT
 
           # https://openapi-generator.tech/docs/usage/#generate
           - name: Generate OpenAPI Client for typescript-fetch
