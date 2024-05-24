@@ -1,22 +1,18 @@
 openapi: 3.0.0
 info:
   title: Sample API
-  description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
+  description: I/O Dayで使用するAPI
   version: 1.0.8
-servers:
-  - url: http://localhost:3000
-    description: Optional server description, e.g. Main (production) server
 paths:
   /api/users:
     get:
-      summary: Returns a list of users.
       description: ユーザー一覧取得
       tags:
         - appsFoo
       operationId: getUsers
       responses:
         '200':
-          description: A JSON array of user names
+          description: ユーザー一覧が取得できた場合
           content:
             application/json:
               schema:
@@ -34,26 +30,6 @@ paths:
                   name: "ユーザー4"
                 - id: 5
                   name: "ユーザー5"
-  /api/users/{id}:
-    get:
-      summary: Returns a list of users.
-      description: 任意のユーザーを1件取得
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-      tags:
-        - appsFoo
-      operationId: getUser
-      responses:
-        '200':
-          description: A JSON of user
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
 components:
   schemas:
     User:
