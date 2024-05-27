@@ -34,50 +34,7 @@ jobs:
       - name: Get vars
         id: vars
         run: |
-          echo "api_version=$(yq r openapi.yaml 'info.version')" >> $GITHUB_OUTPUT
-
-      # 基本はpatchバージョンが更新される
-      # commitメッセージのprefix に特定の文字列があれば minor や major バージョンを更新
-      - name: Get version type
-        uses: actions/github-script@v6
-        id: version-type
-        with:
-          script: |
-            const commits = ${{ toJSON(github.event.commits) }}
-            for (const commit of commits.reverse()) {
-              if (commit.message.startsWith('[openapi/major]')) return 'major'
-              if (commit.message.startsWith('[openapi/minor]')) return 'minor'
-              if (commit.message.startsWith('[openapi/patch]')) return 'patch'
-            }
-            return 'patch'
-          result-encoding: string
-
-      # patchバージョンを更新（例. 1.2.3 → 1.2.4）
-      - name: Version Up (patch)
-        if: steps.version-type.outputs.result == 'patch'
-        run: |
-          VERSION=${{ steps.vars.outputs.current_version }} &&
-          a=( ${VERSION//./ } ) && a[2]=$((a[2] + 1))
-          echo "new_version=${a[0]}.${a[1]}.${a[2]}" >> $GITHUB_ENV
-      # minorバージョンを更新（例. 1.2.3 → 1.3.0）
-      - name: Version Up (minor)
-        if: steps.version-type.outputs.result == 'minor'
-        run: |
-          VERSION=${{ steps.vars.outputs.current_version }} &&
-          a=( ${VERSION//./ } ) && a[1]=$((a[1] + 1))
-          echo "new_version=${a[0]}.${a[1]}.0" >> $GITHUB_ENV
-      # majorバージョンを更新（例. 1.2.3 → 2.0.0）
-      - name: Version Up (major)
-        if: steps.version-type.outputs.result == 'major'
-        run: |
-          VERSION=${{ steps.vars.outputs.current_version }} &&
-          a=( ${VERSION//./ } ) && a[0]=$((a[0] + 1))
-          echo "new_version=${a[0]}.0.0" >> $GITHUB_ENV
-
-      # openapi.yaml のバージョンを上書きする
-      - name: OpenAPI Versioning
-        run: |
-          sed -i -e "s/version: ${{ steps.vars.outputs.current_version }}/version: ${{ env.new_version }}/" openapi.yaml
+          echo "current_version=$(yq r openapi.yaml 'info.version')" >> $GITHUB_OUTPUT
 
       # GitHub Apps は branch protection を bypass する設定をすることで、commit を master に直pushすることができる
       # まずは GitHub Apps のtoken を取得
@@ -87,12 +44,6 @@ jobs:
         with:
           app_id: ${{ secrets.OPENAPI_CLIENT_GENERATED_APP_ID }}
           private_key: ${{ secrets.OPENAPI_CLIENT_GENERATED_PRIVATE_KEY }}
-
-      # 次に backendリポジトリ へ commit
-      - name: Commit New Version to ToruShimizu/io-openapi-backend repo
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "chore(release): openapi.yaml update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
 
       # io-openapi-clientリポジトリにPRを生成するために、io-openapi-clientリポジトリをチェックアウト
       - name: Checkout Client Repogitory
@@ -123,7 +74,8 @@ jobs:
       - name: Update release version
         run: |
           cd client/typescript-fetch-client
-          npm  --no-git-tag-version version ${{ env.new_version }}
+          npm  --no-git-tag-version version ${{ steps.vars.outputs.current_version }}
+
 
       # PR作成
       - name: Create pull request to ToruShimizu/io-openapi-client repo
@@ -132,11 +84,11 @@ jobs:
           token: ${{ steps.generate_token.outputs.token }}
           path: client
           delete-branch: true
-          commit-message: "chore(release): npm package update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
+          commit-message: "chore(release): npm package update version from ${{ steps.vars.outputs.current_version }} to ${{ steps.vars.outputs.current_version }}"
           # [automerge] というprefixをcommitメッセージに付与することで、次のio-openapi-clientリポジトリのworkflowでで自動マージが発火するようにしている
-          title: "[automerge] chore(release): npm package update version from ${{ steps.vars.outputs.current_version }} to ${{ env.new_version }}"
+          title: "[automerge] chore(release): npm package update version from ${{ steps.vars.outputs.current_version }} to ${{ steps.vars.outputs.current_version }}"
           body: |
-            io-openapi-typescript-fetch: ${{ env.new_version }}
+            io-openapi-typescript-fetch: ${{ steps.vars.outputs.current_version }}
           branch: chore/io-openapi-client
           # hashをbranch名に含めることで、同じPRが作られないようにする
           branch-suffix: short-commit-hash
