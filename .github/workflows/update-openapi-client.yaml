@@ -39,7 +39,7 @@ jobs:
       # 基本はpatchバージョンが更新される
       # commitメッセージのprefix に特定の文字列があれば minor や major バージョンを更新
       - name: Get version type
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: version-type
         with:
           script: |
