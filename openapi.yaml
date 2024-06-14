@@ -34,6 +34,31 @@ paths:
                   name: "ユーザー4"
                 - id: 5
                   name: "ユーザー5"
+  /api/users/{id}:
+    get:
+      summary: Returns a list of users.
+      description: Optional extended description in CommonMark or HTML.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - appsFoo
+      operationId: getUser
+      responses:
+        '200':
+          description: A JSON of user
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/User'
+              example:
+                - id: 1
+                  name: "ユーザー1"
 components:
   schemas:
     User:
